@@ -188,7 +188,9 @@ export default function Home() {
       </main>
     );
   return (
-    <main className="page-enter relative mx-auto max-w-6xl overflow-hidden px-3 pb-8 pt-28 sm:px-8 sm:pb-8 sm:pt-24">
+    <>
+      {showWelcome && <Welcome message={welcomeMessage} />}
+      <main className="page-enter relative mx-auto max-w-6xl overflow-hidden px-3 pb-8 pt-28 sm:px-8 sm:pb-8 sm:pt-24">
       <Flower className="flower-top flower-sky flower-float hidden sm:block" />
       <Butterfly className="butterfly-top butterfly-yellow hidden sm:block" />
       <Butterfly className="butterfly-side butterfly-sky hidden sm:block" />
@@ -199,7 +201,6 @@ export default function Home() {
       <Flower className="flower-right flower-float hidden lg:block" />
       <Flower className="flower-mid flower-sky flower-float hidden lg:block" />
       <Flower className="flower-low flower-float hidden lg:block" />
-      {showWelcome && <Welcome message={welcomeMessage} />}
       <PreviewDialog memory={preview} close={() => setPreview(null)} />
       <AppBar
         position="fixed"
@@ -408,7 +409,8 @@ export default function Home() {
           </div>
         </div>
       )}
-    </main>
+      </main>
+    </>
   );
 }
 function UploadModal({
