@@ -87,6 +87,7 @@ export default function Home() {
     if (f && /^image\/(jpeg|png|webp|gif)$|^video\//.test(f.type)) setFile(f);
     else if (f) alert('Please select an image or video file.');
   };
+  const videoCount = memories.filter((memory) => memory.resourceType === 'video').length;
   if (!token)
     return (
       <main className="relative grid min-h-screen place-items-center overflow-hidden p-5">
@@ -133,16 +134,16 @@ export default function Home() {
       </main>
     );
   return (
-    <main className="relative mx-auto max-w-6xl overflow-hidden p-4 sm:p-8">
-      <Flower className="flower-top flower-sky" />
-      <header className="mb-7 flex items-center justify-between">
+    <main className="relative mx-auto max-w-6xl overflow-hidden p-3 sm:p-8">
+      <Flower className="flower-top flower-sky hidden sm:block" />
+      <header className="relative z-10 mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <p className="text-xs font-bold uppercase tracking-[.2em] text-lilac">
             Your private archive
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl">Tessa&apos;s Vault</h1>
         </div>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex w-full items-center justify-between gap-3 text-sm sm:w-auto sm:justify-end">
           <a
             href="/settings"
             className="text-black underline decoration-lilac decoration-2 underline-offset-4"
@@ -154,21 +155,50 @@ export default function Home() {
               localStorage.removeItem('mv-token');
               setToken('');
             }}
-            className="text-stone-500"
+            className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-stone-500 transition hover:border-black hover:text-black"
           >
             Sign out
           </button>
         </div>
       </header>
-      <section className="card relative mb-7 p-4 sm:p-5">
+      <section className="relative z-10 mb-5 grid grid-cols-3 gap-2 sm:gap-3">
+        <Stat
+          label="Memories saved"
+          value={memories.length}
+          detail="Every little moment"
+          tone="bg-white"
+        />
+        <Stat
+          label="Albums made"
+          value={albums.length}
+          detail="Your curated chapters"
+          tone="bg-lilac"
+        />
+        <Stat
+          label="Video moments"
+          value={videoCount}
+          detail="Moving memories"
+          tone="bg-sunshine"
+        />
+      </section>
+      <section className="card relative z-10 mb-6 overflow-hidden p-4 sm:mb-7 sm:p-6">
         <Flower className="flower-bottom" />
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-lilac">
+              Add to your story
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">Save a new memory</h2>
+          </div>
+          <span className="rounded-full bg-sky px-3 py-1 text-xs font-bold">Photo + video</span>
+        </div>
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e: DragEvent) => {
             e.preventDefault();
             pick(e.dataTransfer.files[0]);
           }}
-          className="rounded-xl border-2 border-dashed border-lilac bg-sky/30 p-5 text-center"
+          className="rounded-2xl border-2 border-dashed border-lilac bg-sky/30 p-5 text-center transition hover:bg-sky/60 sm:p-7"
         >
           <input
             id="media"
@@ -179,9 +209,13 @@ export default function Home() {
             onChange={(e: ChangeEvent<HTMLInputElement>) => pick(e.target.files?.[0])}
           />
           <label htmlFor="media" className="cursor-pointer">
-            <span className="text-2xl">＋</span>
-            <p className="mt-1 font-medium">{file ? file.name : 'Add a memory'}</p>
-            <p className="text-sm text-stone-500">Drop a photo or video here, or tap to choose</p>
+            <span className="inline-grid h-10 w-10 place-items-center rounded-full bg-sunshine text-2xl font-light">
+              ＋
+            </span>
+            <p className="mt-2 font-semibold">{file ? file.name : 'Choose a memory to save'}</p>
+            <p className="mt-1 text-sm text-stone-500">
+              Drop a photo or video here, or tap to browse
+            </p>
           </label>
         </div>
         {file && (
@@ -216,28 +250,39 @@ export default function Home() {
           </div>
         )}
       </section>
-      <nav className="mb-6 flex gap-2">
+      <nav className="relative z-10 mb-5 flex w-full rounded-2xl border border-black/10 bg-white p-1.5 shadow-sm sm:mb-6 sm:inline-flex sm:w-auto">
         <button
           onClick={() => setView('timeline')}
-          className={`rounded-full px-4 py-2 text-sm ${view === 'timeline' ? 'bg-lilac text-black' : 'bg-white'}`}
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition sm:flex-none ${view === 'timeline' ? 'bg-lilac text-black shadow-sm' : 'text-stone-500 hover:text-black'}`}
         >
           Timeline
         </button>
         <button
           onClick={() => setView('albums')}
-          className={`rounded-full px-4 py-2 text-sm ${view === 'albums' ? 'bg-lilac text-black' : 'bg-white'}`}
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition sm:flex-none ${view === 'albums' ? 'bg-lilac text-black shadow-sm' : 'text-stone-500 hover:text-black'}`}
         >
           Albums
         </button>
       </nav>
       {view === 'timeline' ? (
-        <div>
+        <div className="relative z-10">
           {memories.length === 0 ? (
-            <p className="py-16 text-center text-stone-500">Your story starts with one memory.</p>
+            <div className="card grid min-h-64 place-items-center p-8 text-center">
+              <div>
+                <span className="text-4xl">✿</span>
+                <p className="mt-3 font-semibold">Your story starts with one memory.</p>
+                <p className="mt-1 text-sm text-stone-500">
+                  Use the panel above to preserve it here.
+                </p>
+              </div>
+            </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
               {memories.map((m) => (
-                <article key={m._id} className="card overflow-hidden">
+                <article
+                  key={m._id}
+                  className="card group overflow-hidden transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+                >
                   <Media m={m} />
                   <div className="p-4">
                     <p className="font-medium">{m.caption || 'Untitled moment'}</p>
@@ -251,8 +296,8 @@ export default function Home() {
           )}
         </div>
       ) : (
-        <div>
-          <div className="mb-5 flex max-w-md gap-2">
+        <div className="relative z-10">
+          <div className="mb-5 flex max-w-md flex-col gap-2 sm:flex-row">
             <input
               className="field"
               placeholder="New album name"
@@ -261,18 +306,23 @@ export default function Home() {
             />
             <button
               onClick={createAlbum}
-              className="rounded-xl bg-sunshine px-4 text-black hover:bg-lilac"
+              className="rounded-xl bg-sunshine px-4 py-3 font-semibold text-black hover:bg-lilac sm:py-0"
             >
               Create
             </button>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {albums.map((a) => (
-              <div className="card p-5" key={a._id}>
-                <p className="text-lg font-semibold">{a.name}</p>
-                <p className="mt-1 text-sm text-stone-500">
-                  {memories.filter((m) => m.album?._id === a._id).length} memories
-                </p>
+            {albums.map((a, index) => (
+              <div className="card group overflow-hidden" key={a._id}>
+                <div
+                  className={`h-3 ${index % 3 === 0 ? 'bg-lilac' : index % 3 === 1 ? 'bg-sky' : 'bg-sunshine'}`}
+                />
+                <div className="p-5">
+                  <p className="text-lg font-semibold">{a.name}</p>
+                  <p className="mt-1 text-sm text-stone-500">
+                    {memories.filter((m) => m.album?._id === a._id).length} memories
+                  </p>
+                </div>
               </div>
             ))}
           </div>
@@ -281,11 +331,30 @@ export default function Home() {
     </main>
   );
 }
+function Stat({
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  label: string;
+  value: number;
+  detail: string;
+  tone: string;
+}) {
+  return (
+    <div className={`rounded-2xl border border-black/10 p-4 shadow-sm ${tone}`}>
+      <p className="text-2xl font-semibold">{value}</p>
+      <p className="mt-1 text-sm font-semibold">{label}</p>
+      <p className="mt-0.5 text-xs text-black/60">{detail}</p>
+    </div>
+  );
+}
 function Media({ m }: { m: Memory }) {
   return m.resourceType === 'video' ? (
-    <video className="h-56 w-full bg-black object-cover" controls src={m.url} />
+    <video className="h-48 w-full bg-black object-cover sm:h-56" controls src={m.url} />
   ) : (
-    <img className="h-56 w-full object-cover" src={m.url} alt={m.caption || 'Memory'} />
+    <img className="h-48 w-full object-cover sm:h-56" src={m.url} alt={m.caption || 'Memory'} />
   );
 }
 
