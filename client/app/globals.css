@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #bfe3f8;
+  color: #111111;
+  font-family: Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at 10% 14%, #b9a7e8 0 3px, transparent 4px),
+    radial-gradient(circle at 88% 88%, #f8d84e 0 3px, transparent 4px);
+  background-size:
+    34px 34px,
+    46px 46px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+.card {
+  @apply rounded-2xl bg-white shadow-sm ring-1 ring-black/10;
+}
+.field {
+  @apply w-full rounded-xl border border-sky bg-white px-3 py-2.5 outline-none focus:border-lilac focus:ring-2 focus:ring-lilac/30;
+}
+.flower {
+  position: absolute;
+  width: 4.5rem;
+  height: 4.5rem;
+  pointer-events: none;
+  z-index: 0;
+}
+.flower::before,
+.flower::after,
+.flower > span::before,
+.flower > span::after {
+  content: '';
+  position: absolute;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 2px solid #111;
+  border-radius: 999px 999px 999px 0;
+  background: #b9a7e8;
+}
+.flower::before {
+  top: 0;
+  left: 1.15rem;
+  transform: rotate(45deg);
+}
+.flower::after {
+  bottom: 0;
+  left: 1.15rem;
+  transform: rotate(225deg);
+}
+.flower > span::before {
+  top: 1.15rem;
+  left: 0;
+  transform: rotate(-45deg);
+}
+.flower > span::after {
+  top: 1.15rem;
+  right: 0;
+  transform: rotate(135deg);
+}
+.flower-center {
+  position: absolute;
+  top: 1.65rem;
+  left: 1.65rem;
+  z-index: 1;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 2px solid #111;
+  border-radius: 999px;
+  background: #f8d84e;
+}
+.flower-sky::before,
+.flower-sky::after,
+.flower-sky > span::before,
+.flower-sky > span::after {
+  background: #bfe3f8;
+}
+.flower-top {
+  top: -1.5rem;
+  right: -1rem;
+  transform: rotate(13deg);
+}
+.flower-bottom {
+  bottom: -2rem;
+  left: -1.4rem;
+  transform: rotate(-20deg) scale(0.72);
+}
