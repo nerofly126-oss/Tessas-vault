@@ -17,6 +17,7 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET!,
   adminEmail: process.env.ADMIN_EMAIL!,
   adminHash: process.env.ADMIN_PASSWORD_HASH!,
+  frontendUrl: process.env.FRONTEND_URL,
   cloudinary: {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
     api_key: process.env.CLOUDINARY_API_KEY!,

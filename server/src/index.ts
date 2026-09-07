@@ -7,7 +7,10 @@ import albumRoutes from './routes/albums';
 import memoryRoutes from './routes/memories';
 import { auth } from './middleware/auth';
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+const allowedOrigins = ['http://localhost:3000', env.frontendUrl].filter(
+  (origin): origin is string => Boolean(origin),
+);
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/albums', auth, albumRoutes);
@@ -23,3 +26,5 @@ mongoose
     console.error('MongoDB connection failed', err);
     process.exit(1);
   });
+
+export default app;
