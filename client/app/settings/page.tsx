@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://tessasvaultbackend.vercel.app/api';
 
 export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -45,8 +45,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="relative mx-auto min-h-screen max-w-xl overflow-hidden p-5 sm:p-8">
-      <div aria-hidden="true" className="flower flower-top flower-sky">
+    <main className="page-enter relative mx-auto min-h-screen max-w-xl overflow-hidden p-5 sm:p-8">
+      <div aria-hidden="true" className="flower flower-top flower-sky flower-float">
         <span />
         <i className="flower-center" />
       </div>

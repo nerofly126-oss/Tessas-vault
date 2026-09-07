@@ -1,6 +1,26 @@
 'use client';
 import { ChangeEvent, DragEvent, useEffect, useState } from 'react';
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+import {
+  AppBar,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://tessasvaultbackend.vercel.app/api';
 type Album = { _id: string; name: string; coverUrl?: string };
 type Memory = {
   _id: string;
@@ -21,11 +41,16 @@ export default function Home() {
     [memories, setMemories] = useState<Memory[]>([]),
     [albums, setAlbums] = useState<Album[]>([]),
     [file, setFile] = useState<File | null>(null),
+    [uploadOpen, setUploadOpen] = useState(false),
+    [preview, setPreview] = useState<Memory | null>(null),
+    [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null),
     [caption, setCaption] = useState(''),
     [date, setDate] = useState(new Date().toISOString().slice(0, 10)),
     [albumId, setAlbumId] = useState(''),
     [busy, setBusy] = useState(false),
     [newAlbum, setNewAlbum] = useState('');
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState('');
   const headers = () => ({ Authorization: `Bearer ${token}` });
   const load = async () => {
     const [m, a] = await Promise.all([
@@ -42,7 +67,20 @@ export default function Home() {
     }
   }, []);
   useEffect(() => {
-    if (token) load();
+    if (token) {
+      load();
+      const messages = [
+        'You’re beautiful, Tessa.',
+        'Your light makes ordinary days glow.',
+        'A soft reminder: you are deeply loved.',
+        'You make the world a little more lovely.',
+        'Today looks good on you.',
+      ];
+      setWelcomeMessage(messages[Math.floor(Math.random() * messages.length)]);
+      setShowWelcome(true);
+      const timer = window.setTimeout(() => setShowWelcome(false), 2700);
+      return () => window.clearTimeout(timer);
+    }
   }, [token]);
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +107,7 @@ export default function Home() {
     if (!r.ok) return alert('Upload failed. Check your Cloudinary settings.');
     setFile(null);
     setCaption('');
+    setUploadOpen(false);
     await load();
   };
   const createAlbum = async () => {
@@ -83,6 +122,20 @@ export default function Home() {
       load();
     }
   };
+  const deleteMemory = async (memory: Memory) => {
+    if (
+      !window.confirm(
+        `Delete “${memory.caption || 'this memory'}”? This also removes the original file.`,
+      )
+    )
+      return;
+    const response = await fetch(`${API}/memories/${memory._id}`, {
+      method: 'DELETE',
+      headers: headers(),
+    });
+    if (!response.ok) return alert('Could not delete this memory. Please try again.');
+    await load();
+  };
   const pick = (f?: File) => {
     if (f && /^image\/(jpeg|png|webp|gif)$|^video\//.test(f.type)) setFile(f);
     else if (f) alert('Please select an image or video file.');
@@ -90,9 +143,10 @@ export default function Home() {
   const videoCount = memories.filter((memory) => memory.resourceType === 'video').length;
   if (!token)
     return (
-      <main className="relative grid min-h-screen place-items-center overflow-hidden p-5">
-        <Flower className="flower-top" />
-        <Flower className="flower-bottom flower-sky" />
+      <main className="page-enter relative grid min-h-screen place-items-center overflow-hidden p-5">
+        <Flower className="flower-top flower-float" />
+        <Flower className="flower-bottom flower-sky flower-float" />
+        <Butterfly className="butterfly-top butterfly-yellow" />
         <form onSubmit={login} className="card relative z-10 w-full max-w-sm p-7">
           <p className="text-xs font-bold uppercase tracking-[.2em] text-lilac">
             Tessa&apos;s Vault
@@ -134,33 +188,87 @@ export default function Home() {
       </main>
     );
   return (
-    <main className="relative mx-auto max-w-6xl overflow-hidden p-3 sm:p-8">
-      <Flower className="flower-top flower-sky hidden sm:block" />
-      <header className="relative z-10 mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[.2em] text-lilac">
-            Your private archive
-          </p>
-          <h1 className="text-3xl font-semibold sm:text-4xl">Tessa&apos;s Vault</h1>
-        </div>
-        <div className="flex w-full items-center justify-between gap-3 text-sm sm:w-auto sm:justify-end">
-          <a
-            href="/settings"
-            className="text-black underline decoration-lilac decoration-2 underline-offset-4"
-          >
-            Settings
-          </a>
-          <button
-            onClick={() => {
-              localStorage.removeItem('mv-token');
-              setToken('');
-            }}
-            className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-stone-500 transition hover:border-black hover:text-black"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+    <main className="page-enter relative mx-auto max-w-6xl overflow-hidden px-3 pb-8 pt-28 sm:px-8 sm:pb-8 sm:pt-24">
+      <Flower className="flower-top flower-sky flower-float hidden sm:block" />
+      <Butterfly className="butterfly-top butterfly-yellow hidden sm:block" />
+      <Butterfly className="butterfly-side butterfly-sky hidden sm:block" />
+      <Butterfly className="butterfly-low hidden sm:block" />
+      <Butterfly className="butterfly-mid butterfly-yellow hidden lg:block" />
+      <Butterfly className="butterfly-far butterfly-sky hidden lg:block" />
+      <Flower className="flower-left flower-float hidden lg:block" />
+      <Flower className="flower-right flower-float hidden lg:block" />
+      <Flower className="flower-mid flower-sky flower-float hidden lg:block" />
+      <Flower className="flower-low flower-float hidden lg:block" />
+      {showWelcome && <Welcome message={welcomeMessage} />}
+      <PreviewDialog memory={preview} close={() => setPreview(null)} />
+      <AppBar
+        position="fixed"
+        elevation={0}
+        className="z-40 border-b border-black/15"
+        sx={{
+          top: 0,
+          left: 0,
+          right: 0,
+          width: '100%',
+          bgcolor: 'rgba(255,255,255,.72)',
+          color: '#111111',
+          backdropFilter: 'blur(18px) saturate(160%)',
+        }}
+      >
+        <Toolbar className="mx-auto flex min-h-20 w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:min-h-0 sm:px-8">
+          <div className="min-w-0">
+            <Typography
+              variant="overline"
+              sx={{ color: '#B9A7E8', fontWeight: 800, letterSpacing: '.18em' }}
+            >
+              Your private archive
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 700, lineHeight: 1 }}>
+              Tessa&apos;s Vault
+            </Typography>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              onClick={() => setUploadOpen(true)}
+              variant="contained"
+              color="secondary"
+              startIcon={<AddPhotoAlternateOutlinedIcon />}
+            >
+              Add memory
+            </Button>
+            <IconButton
+              onClick={(event) => setMenuAnchor(event.currentTarget)}
+              aria-label="Open navigation menu"
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+          </div>
+        </Toolbar>
+      </AppBar>
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={() => setMenuAnchor(null)}
+        slotProps={{
+          paper: { sx: { mt: 1, minWidth: 170, border: '1px solid rgba(17,17,17,.12)' } },
+        }}
+      >
+        <MenuItem component="a" href="/settings" onClick={() => setMenuAnchor(null)}>
+          <SettingsOutlinedIcon fontSize="small" className="mr-3" />
+          Settings
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            localStorage.removeItem('mv-token');
+            setToken('');
+            setMenuAnchor(null);
+          }}
+        >
+          <LogoutIcon fontSize="small" className="mr-3" />
+          Sign out
+        </MenuItem>
+      </Menu>
       <section className="relative z-10 mb-5 grid grid-cols-3 gap-2 sm:gap-3">
         <Stat
           label="Memories saved"
@@ -181,85 +289,32 @@ export default function Home() {
           tone="bg-sunshine"
         />
       </section>
-      <section className="card relative z-10 mb-6 overflow-hidden p-4 sm:mb-7 sm:p-6">
-        <Flower className="flower-bottom" />
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-lilac">
-              Add to your story
-            </p>
-            <h2 className="mt-1 text-xl font-semibold">Save a new memory</h2>
-          </div>
-          <span className="rounded-full bg-sky px-3 py-1 text-xs font-bold">Photo + video</span>
-        </div>
-        <div
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e: DragEvent) => {
-            e.preventDefault();
-            pick(e.dataTransfer.files[0]);
-          }}
-          className="rounded-2xl border-2 border-dashed border-lilac bg-sky/30 p-5 text-center transition hover:bg-sky/60 sm:p-7"
-        >
-          <input
-            id="media"
-            className="hidden"
-            type="file"
-            accept="image/*,video/*"
-            capture="environment"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => pick(e.target.files?.[0])}
-          />
-          <label htmlFor="media" className="cursor-pointer">
-            <span className="inline-grid h-10 w-10 place-items-center rounded-full bg-sunshine text-2xl font-light">
-              ＋
-            </span>
-            <p className="mt-2 font-semibold">{file ? file.name : 'Choose a memory to save'}</p>
-            <p className="mt-1 text-sm text-stone-500">
-              Drop a photo or video here, or tap to browse
-            </p>
-          </label>
-        </div>
-        {file && (
-          <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_170px_170px_auto]">
-            <input
-              className="field"
-              placeholder="Write a caption…"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-            />
-            <input
-              className="field"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-            <select className="field" value={albumId} onChange={(e) => setAlbumId(e.target.value)}>
-              <option value="">No album</option>
-              {albums.map((a) => (
-                <option key={a._id} value={a._id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={upload}
-              disabled={busy}
-              className="rounded-xl bg-sunshine px-5 py-2 font-semibold text-black hover:bg-lilac"
-            >
-              {busy ? 'Saving…' : 'Save'}
-            </button>
-          </div>
-        )}
-      </section>
-      <nav className="relative z-10 mb-5 flex w-full rounded-2xl border border-black/10 bg-white p-1.5 shadow-sm sm:mb-6 sm:inline-flex sm:w-auto">
+      {uploadOpen && (
+        <UploadModal
+          close={() => setUploadOpen(false)}
+          file={file}
+          pick={pick}
+          caption={caption}
+          setCaption={setCaption}
+          date={date}
+          setDate={setDate}
+          albumId={albumId}
+          setAlbumId={setAlbumId}
+          albums={albums}
+          upload={upload}
+          busy={busy}
+        />
+      )}
+      <nav className="gallery-toolbar relative z-10 mb-5 flex w-full sm:mb-6 sm:inline-flex">
         <button
           onClick={() => setView('timeline')}
-          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition sm:flex-none ${view === 'timeline' ? 'bg-lilac text-black shadow-sm' : 'text-stone-500 hover:text-black'}`}
+          className={`flex-1 border-b-4 px-5 py-3 text-sm font-semibold transition sm:flex-none ${view === 'timeline' ? 'border-lilac bg-lilac/30 text-black' : 'border-transparent text-stone-500 hover:bg-sky/30 hover:text-black'}`}
         >
           Timeline
         </button>
         <button
           onClick={() => setView('albums')}
-          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition sm:flex-none ${view === 'albums' ? 'bg-lilac text-black shadow-sm' : 'text-stone-500 hover:text-black'}`}
+          className={`flex-1 border-b-4 px-5 py-3 text-sm font-semibold transition sm:flex-none ${view === 'albums' ? 'border-lilac bg-lilac/30 text-black' : 'border-transparent text-stone-500 hover:bg-sky/30 hover:text-black'}`}
         >
           Albums
         </button>
@@ -271,9 +326,7 @@ export default function Home() {
               <div>
                 <span className="text-4xl">✿</span>
                 <p className="mt-3 font-semibold">Your story starts with one memory.</p>
-                <p className="mt-1 text-sm text-stone-500">
-                  Use the panel above to preserve it here.
-                </p>
+                <p className="mt-1 text-sm text-stone-500">Tap “Add memory” to preserve it here.</p>
               </div>
             </div>
           ) : (
@@ -281,14 +334,41 @@ export default function Home() {
               {memories.map((m) => (
                 <article
                   key={m._id}
-                  className="card group overflow-hidden transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+                  className="card gallery-card group overflow-hidden transition duration-200 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <Media m={m} />
-                  <div className="p-4">
-                    <p className="font-medium">{m.caption || 'Untitled moment'}</p>
-                    <p className="mt-1 text-sm text-stone-500">
-                      {fmt(m.date)} {m.album && ` · ${m.album.name}`}
-                    </p>
+                  <button
+                    className="block w-full text-left"
+                    onClick={() => setPreview(m)}
+                    aria-label={`Preview ${m.caption || 'memory'}`}
+                  >
+                    <Media m={m} />
+                  </button>
+                  <div className="flex items-start justify-between gap-3 p-4">
+                    <div>
+                      <p className="font-medium">{m.caption || 'Untitled moment'}</p>
+                      <p className="mt-1 text-sm text-stone-500">
+                        {fmt(m.date)} {m.album && ` · ${m.album.name}`}
+                      </p>
+                    </div>
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setPreview(m)}
+                      sx={{ minWidth: 0, px: 1 }}
+                    >
+                      <VisibilityOutlinedIcon fontSize="small" className="mr-1" />
+                      Preview
+                    </Button>
+                    <Button
+                      color="error"
+                      size="small"
+                      onClick={() => deleteMemory(m)}
+                      sx={{ minWidth: 0, px: 1 }}
+                      aria-label={`Delete ${m.caption || 'memory'}`}
+                    >
+                      <DeleteOutlineIcon fontSize="small" className="mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </article>
               ))}
@@ -313,7 +393,7 @@ export default function Home() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {albums.map((a, index) => (
-              <div className="card group overflow-hidden" key={a._id}>
+              <div className="card gallery-card group overflow-hidden" key={a._id}>
                 <div
                   className={`h-3 ${index % 3 === 0 ? 'bg-lilac' : index % 3 === 1 ? 'bg-sky' : 'bg-sunshine'}`}
                 />
@@ -329,6 +409,130 @@ export default function Home() {
         </div>
       )}
     </main>
+  );
+}
+function UploadModal({
+  close,
+  file,
+  pick,
+  caption,
+  setCaption,
+  date,
+  setDate,
+  albumId,
+  setAlbumId,
+  albums,
+  upload,
+  busy,
+}: {
+  close: () => void;
+  file: File | null;
+  pick: (file?: File) => void;
+  caption: string;
+  setCaption: (value: string) => void;
+  date: string;
+  setDate: (value: string) => void;
+  albumId: string;
+  setAlbumId: (value: string) => void;
+  albums: Album[];
+  upload: () => Promise<void>;
+  busy: boolean;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-end bg-black/40 p-0 sm:place-items-center sm:p-5"
+      role="dialog"
+      aria-modal="true"
+    >
+      <section className="relative max-h-[92dvh] w-full max-w-xl overflow-y-auto border-t-4 border-lilac bg-white p-5 pb-8 shadow-2xl sm:max-h-[88vh] sm:border-4 sm:p-7">
+        {busy && (
+          <div className="absolute inset-0 z-20 grid place-items-center bg-white/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3">
+              <CircularProgress color="secondary" />
+              <p className="font-semibold">Saving your memory…</p>
+              <p className="text-sm text-stone-500">Please keep this window open.</p>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={close}
+          className="absolute right-5 top-5 z-10 grid h-9 w-9 place-items-center border border-black bg-sky"
+          aria-label="Close upload"
+        >
+          <CloseIcon fontSize="small" />
+        </button>
+        <p className="text-xs font-bold uppercase tracking-[.18em] text-lilac">Add to your story</p>
+        <h2 className="mt-1 text-2xl font-semibold">Save a new memory</h2>
+        <div
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event: DragEvent) => {
+            event.preventDefault();
+            pick(event.dataTransfer.files[0]);
+          }}
+          className="mt-5 border-2 border-dashed border-lilac bg-sky/30 p-7 text-center"
+        >
+          <input
+            id="media"
+            className="hidden"
+            type="file"
+            accept="image/*,video/*"
+            capture="environment"
+            onChange={(event: ChangeEvent<HTMLInputElement>) => pick(event.target.files?.[0])}
+          />
+          <label htmlFor="media" className="cursor-pointer">
+            <span className="inline-grid h-10 w-10 place-items-center border border-black bg-sunshine">
+              <AddPhotoAlternateOutlinedIcon />
+            </span>
+            <p className="mt-2 font-semibold">{file ? file.name : 'Choose a photo or video'}</p>
+            <p className="mt-1 text-sm text-stone-500">Drop it here, or tap to browse</p>
+          </label>
+        </div>
+        <div className="mt-4 grid gap-3">
+          <input
+            className="field"
+            placeholder="Write a caption…"
+            value={caption}
+            onChange={(event) => setCaption(event.target.value)}
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input
+              className="field"
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+            />
+            <select
+              className="field"
+              value={albumId}
+              onChange={(event) => setAlbumId(event.target.value)}
+            >
+              <option value="">No album</option>
+              {albums.map((album) => (
+                <option key={album._id} value={album._id}>
+                  {album.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button
+            onClick={upload}
+            disabled={busy || !file}
+            variant="contained"
+            color="secondary"
+            fullWidth
+            startIcon={
+              busy ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                <AddPhotoAlternateOutlinedIcon />
+              )
+            }
+          >
+            {busy ? 'Saving…' : 'Save memory'}
+          </Button>
+        </div>
+      </section>
+    </div>
   );
 }
 function Stat({
@@ -352,9 +556,49 @@ function Stat({
 }
 function Media({ m }: { m: Memory }) {
   return m.resourceType === 'video' ? (
-    <video className="h-48 w-full bg-black object-cover sm:h-56" controls src={m.url} />
+    <video className="h-48 w-full bg-black object-cover sm:h-56" muted playsInline src={m.url} />
   ) : (
     <img className="h-48 w-full object-cover sm:h-56" src={m.url} alt={m.caption || 'Memory'} />
+  );
+}
+
+function PreviewDialog({ memory, close }: { memory: Memory | null; close: () => void }) {
+  return (
+    <Dialog
+      open={Boolean(memory)}
+      onClose={close}
+      maxWidth="lg"
+      fullWidth
+      slotProps={{ paper: { sx: { bgcolor: '#111111', borderRadius: 4, overflow: 'hidden' } } }}
+    >
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          color: '#FFFFFF',
+          pr: 1,
+        }}
+      >
+        {memory?.caption || 'Memory preview'}
+        <IconButton onClick={close} aria-label="Close preview" sx={{ color: '#FFFFFF' }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ p: 0, display: 'grid', placeItems: 'center', bgcolor: '#111111' }}>
+        {memory?.resourceType === 'video' ? (
+          <video className="max-h-[75vh] w-full" controls autoPlay src={memory.url} />
+        ) : (
+          memory && (
+            <img
+              className="max-h-[75vh] max-w-full object-contain"
+              src={memory.url}
+              alt={memory.caption || 'Memory preview'}
+            />
+          )
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -363,6 +607,32 @@ function Flower({ className = '' }: { className?: string }) {
     <div aria-hidden="true" className={`flower ${className}`}>
       <span />
       <i className="flower-center" />
+    </div>
+  );
+}
+
+function Butterfly({ className = '' }: { className?: string }) {
+  return (
+    <div aria-hidden="true" className={`butterfly ${className}`}>
+      <span />
+    </div>
+  );
+}
+
+function Welcome({ message }: { message: string }) {
+  return (
+    <div className="welcome-screen fixed inset-0 z-[60] grid place-items-center bg-sky/90 p-5">
+      <Flower className="flower-top flower-float" />
+      <Flower className="flower-bottom flower-sky flower-float" />
+      <Butterfly className="butterfly-top butterfly-yellow" />
+      <section className="welcome-card relative max-w-md p-8 text-center">
+        <span className="text-4xl">✿</span>
+        <p className="mt-4 text-xs font-bold uppercase tracking-[.2em] text-black/70">
+          Welcome to your vault
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold leading-snug text-black">{message}</h2>
+        <p className="mt-3 text-sm text-black/70">Let’s hold on to something beautiful today.</p>
+      </section>
     </div>
   );
 }

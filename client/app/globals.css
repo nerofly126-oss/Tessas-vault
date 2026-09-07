@@ -6,15 +6,25 @@
 }
 body {
   margin: 0;
-  background: #bfe3f8;
+  background: #f5f0ff;
   color: #111111;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
   background-image:
     radial-gradient(circle at 10% 14%, #b9a7e8 0 3px, transparent 4px),
-    radial-gradient(circle at 88% 88%, #f8d84e 0 3px, transparent 4px);
+    radial-gradient(circle at 88% 88%, #f8d84e 0 3px, transparent 4px),
+    linear-gradient(135deg, rgba(191, 227, 248, 0.38), transparent 46%);
   background-size:
     34px 34px,
-    46px 46px;
+    46px 46px,
+    100% 100%;
+}
+h1,
+h2,
+h3,
+.vault-display {
+  font-family: 'Brush Script MT', 'Segoe Print', 'Bradley Hand', cursive;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 button,
 input,
@@ -22,10 +32,43 @@ select {
   font: inherit;
 }
 .card {
-  @apply rounded-2xl bg-white shadow-sm ring-1 ring-black/10;
+  @apply bg-white shadow-sm ring-1 ring-black/10;
+  animation: surface-rise 0.55s ease-out both;
 }
 .field {
-  @apply w-full rounded-xl border border-sky bg-white px-3 py-2.5 outline-none focus:border-lilac focus:ring-2 focus:ring-lilac/30;
+  @apply w-full border border-sky bg-white px-3 py-2.5 outline-none focus:border-lilac focus:ring-2 focus:ring-lilac/30;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.field:focus {
+  transform: translateY(-1px);
+}
+.rounded-full,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl,
+.MuiPaper-root,
+.MuiButton-root,
+.MuiIconButton-root,
+.MuiMenu-paper {
+  border-radius: 0 !important;
+}
+.page-enter {
+  animation: page-enter 0.55s ease-out both;
+}
+.gallery-card {
+  animation: card-in 0.5s ease-out both;
+}
+.gallery-card:nth-child(2n) {
+  animation-delay: 0.07s;
+}
+.gallery-card:nth-child(3n) {
+  animation-delay: 0.14s;
+}
+.gallery-card:nth-child(4n) {
+  animation-delay: 0.21s;
 }
 .flower {
   position: absolute;
@@ -92,4 +135,203 @@ select {
   bottom: -2rem;
   left: -1.4rem;
   transform: rotate(-20deg) scale(0.72);
+}
+.flower-float {
+  animation: flower-float 6s ease-in-out infinite;
+}
+.butterfly {
+  position: absolute;
+  z-index: 1;
+  width: 2.25rem;
+  height: 1.7rem;
+  pointer-events: none;
+  animation: butterfly-drift 9s ease-in-out infinite;
+}
+.butterfly::before,
+.butterfly::after {
+  content: '';
+  position: absolute;
+  top: 0.25rem;
+  width: 1rem;
+  height: 1.2rem;
+  border: 2px solid #111;
+  background: #b9a7e8;
+}
+.butterfly::before {
+  left: 0.1rem;
+  border-radius: 90% 15% 90% 20%;
+  transform-origin: right bottom;
+  animation: wing-left 0.7s ease-in-out infinite alternate;
+}
+.butterfly::after {
+  right: 0.1rem;
+  border-radius: 15% 90% 20% 90%;
+  transform-origin: left bottom;
+  animation: wing-right 0.7s ease-in-out infinite alternate;
+}
+.butterfly span {
+  position: absolute;
+  z-index: 1;
+  left: 1rem;
+  top: 0.48rem;
+  width: 0.28rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: #111;
+}
+.butterfly-sky::before,
+.butterfly-sky::after {
+  background: #bfe3f8;
+}
+.butterfly-yellow::before,
+.butterfly-yellow::after {
+  background: #f8d84e;
+}
+.butterfly-top {
+  top: 8.5rem;
+  right: 3.5rem;
+  transform: rotate(18deg);
+}
+.butterfly-side {
+  top: 53%;
+  left: -0.4rem;
+  transform: rotate(-15deg) scale(0.8);
+  animation-delay: -3s;
+}
+.butterfly-low {
+  bottom: 4rem;
+  right: 0.5rem;
+  transform: rotate(-18deg) scale(0.72);
+  animation-delay: -6s;
+}
+.butterfly-mid {
+  top: 19rem;
+  right: 0.75rem;
+  transform: rotate(25deg) scale(0.62);
+  animation-delay: -4s;
+}
+.butterfly-far {
+  bottom: 18rem;
+  left: 1rem;
+  transform: rotate(-28deg) scale(0.58);
+  animation-delay: -7s;
+}
+.flower-mid {
+  top: 13rem;
+  left: -1.2rem;
+  transform: rotate(-12deg) scale(0.52);
+  animation-delay: -2s;
+}
+.flower-low {
+  bottom: 2rem;
+  left: 25%;
+  transform: rotate(17deg) scale(0.46);
+  animation-delay: -4s;
+}
+.gallery-toolbar {
+  border-bottom: 1px solid rgba(17, 17, 17, 0.16);
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(12px);
+}
+.flower-left {
+  top: 26rem;
+  left: -1.5rem;
+  transform: rotate(-18deg) scale(0.62);
+}
+.flower-right {
+  bottom: 10rem;
+  right: -1.2rem;
+  transform: rotate(22deg) scale(0.55);
+}
+.welcome-screen {
+  animation: welcome-in 0.35s ease-out;
+}
+.welcome-card {
+  animation: welcome-card 2.7s ease-in-out both;
+}
+@keyframes flower-float {
+  50% {
+    translate: 0 12px;
+    rotate: 8deg;
+  }
+}
+@keyframes butterfly-drift {
+  50% {
+    translate: 22px -18px;
+    rotate: 12deg;
+  }
+}
+@keyframes wing-left {
+  to {
+    transform: rotate(-22deg) scaleY(0.84);
+  }
+}
+@keyframes wing-right {
+  to {
+    transform: rotate(22deg) scaleY(0.84);
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+  }
+}
+@keyframes surface-rise {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+  }
+}
+@keyframes welcome-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes welcome-card {
+  0% {
+    opacity: 0;
+    translate: 0 18px;
+    scale: 0.96;
+  }
+  18%,
+  76% {
+    opacity: 1;
+    translate: 0;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -8px;
+    scale: 1.02;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flower-float,
+  .butterfly,
+  .butterfly::before,
+  .butterfly::after {
+    animation: none;
+  }
 }
