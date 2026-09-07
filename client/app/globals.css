@@ -35,6 +35,32 @@ select {
   @apply bg-white shadow-sm ring-1 ring-black/10;
   animation: surface-rise 0.55s ease-out both;
 }
+.heart-border::before,
+.heart-border::after {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border: 1px solid #111;
+  background: #f8d84e;
+  color: #111;
+  content: '♥';
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  line-height: 1;
+  clip-path: polygon(50% 88%, 8% 50%, 0 30%, 11% 9%, 31% 4%, 50% 19%, 69% 4%, 89% 9%, 100% 30%, 92% 50%);
+}
+.heart-border::before {
+  top: -0.78rem;
+  left: 1rem;
+}
+.heart-border::after {
+  right: 1rem;
+  bottom: -0.78rem;
+  background: #b9a7e8;
+}
 .field {
   @apply w-full border border-sky bg-white px-3 py-2.5 outline-none focus:border-lilac focus:ring-2 focus:ring-lilac/30;
   transition:

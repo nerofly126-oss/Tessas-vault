@@ -147,7 +147,7 @@ export default function Home() {
         <Flower className="flower-top flower-float" />
         <Flower className="flower-bottom flower-sky flower-float" />
         <Butterfly className="butterfly-top butterfly-yellow" />
-        <form onSubmit={login} className="card relative z-10 w-full max-w-sm p-7">
+        <form onSubmit={login} className="card heart-border relative z-10 w-full max-w-sm p-7">
           <p className="text-xs font-bold uppercase tracking-[.2em] text-lilac">
             Tessa&apos;s Vault
           </p>
@@ -446,7 +446,7 @@ function UploadModal({
       role="dialog"
       aria-modal="true"
     >
-      <section className="relative max-h-[92dvh] w-full max-w-xl overflow-y-auto border-t-4 border-lilac bg-white p-5 pb-8 shadow-2xl sm:max-h-[88vh] sm:border-4 sm:p-7">
+      <section className="heart-border relative max-h-[92dvh] w-full max-w-xl overflow-y-auto border-t-4 border-lilac bg-white p-5 pb-8 shadow-2xl sm:max-h-[88vh] sm:border-4 sm:p-7">
         {busy && (
           <div className="absolute inset-0 z-20 grid place-items-center bg-white/80 backdrop-blur-sm">
             <div className="flex flex-col items-center gap-3">
@@ -549,7 +549,7 @@ function Stat({
   tone: string;
 }) {
   return (
-    <div className={`rounded-2xl border border-black/10 p-4 shadow-sm ${tone}`}>
+    <div className={`heart-border relative rounded-2xl border border-black/10 p-4 shadow-sm ${tone}`}>
       <p className="text-2xl font-semibold">{value}</p>
       <p className="mt-1 text-sm font-semibold">{label}</p>
       <p className="mt-0.5 text-xs text-black/60">{detail}</p>
